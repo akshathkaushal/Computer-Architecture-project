@@ -20,15 +20,13 @@
 
 */
 
-/*000000
+/*
     Instructions:
     
     1) addi
-    2) add
-    3) subtract
-    4) subtract immidiate
-    5) mul
-    6) jump
+    2) subtract
+    3) mul
+    4) jump
 */
 
 
@@ -70,13 +68,48 @@ char tellType(string instruction)
 }   // working fine
 
 // Seperate different fields according to the type of instruction
-vector<int> decodeInstruct(string instruction, char type)
+vector<int> decodeInstruct(string instruction)
 {
     // the course of this function will be determined by the return value of tellType function
 	vector<int> fields;
-    
-    
-    
+    int opcode, rs, rt, rd, shamt, func, value, address;
+    // value for addi, subi etc and address for jump
+
+    char type = tellType(instruction);
+
+    opcode = binToInt(instruction.substr(0,5));    
+    fields.push_back(opcode);
+
+    if(type=='r')
+    {
+        rs = binToInt(instruction.substr(6, 10));
+        fields.push_back(rs);
+        rd = binToInt(instruction.substr(11, 15));
+        fields.push_back(rd);
+        rt = binToInt(instruction.substr(16, 20));
+        fields.push_back(rt);
+        shamt = binToInt(instruction.substr(20, 25));
+        fields.push_back(shamt);
+        func = binToInt(instruction.substr(26, instruction.length()-1));
+        fields.push_back(func);
+    }
+
+    else if(type=='i')
+    {
+        rs = binToInt(instruction.substr(6, 10));
+        fields.push_back(rs);
+        rt = binToInt(instruction.substr(11, 15));
+        fields.push_back(rt);
+        value = binToInt(instruction.substr(16, instruction.length()-1));
+        fields.push_back(value);
+    }
+
+    else if(type=='j')
+    {
+        address = binToInt(instruction.substr(6, instruction.length()-1));
+        fields.push_back(address);
+    }
+
 	return fields;
 }
 
