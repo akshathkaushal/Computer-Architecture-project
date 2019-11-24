@@ -56,6 +56,35 @@ int binToInt(string binary)
     return dec_value;   // working perfectly
 }	
 
+int twosComplement(string address)
+{
+    // 111101
+    for(int i=0;i<address.length();i++)
+    {
+        if(address[i]=='1')
+        {
+            address[i]='0';
+        }
+        else address[i]='1';
+    }
+
+    int carry=1;
+    for(int i=address.length()-1;i>=0;i--)
+    {
+        if(address[i]=='1' && carry==1){
+            address[i]='0';
+            carry=1;
+        }
+
+        else if(address[i]=='0' && carry==1)
+        {
+            address[i]='1';
+            carry=0;
+        }
+    }
+    return binToInt(address)*(-1);
+}
+
 // Tell whether the instruction set is R type or I type or J type
 char tellType(string instruction)
 {
@@ -77,42 +106,47 @@ vector<int> decodeInstruct(string instruction)
 
     char type = tellType(instruction);
 
-    opcode = binToInt(instruction.substr(0,5));    
+    opcode = binToInt(instruction.substr(0,6));
+   
     fields.push_back(opcode);
 
     if(type=='r')
     {
-        rs = binToInt(instruction.substr(6, 10));
+        rs = binToInt(instruction.substr(6, 5));
         fields.push_back(rs);
-        rd = binToInt(instruction.substr(11, 15));
+        rd = binToInt(instruction.substr(11, 5));
         fields.push_back(rd);
-        rt = binToInt(instruction.substr(16, 20));
+        rt = binToInt(instruction.substr(16, 5));
         fields.push_back(rt);
-        shamt = binToInt(instruction.substr(20, 25));
+        shamt = binToInt(instruction.substr(21, 5));
         fields.push_back(shamt);
-        func = binToInt(instruction.substr(26, instruction.length()-1));
+        func = binToInt(instruction.substr(26, 6));
         fields.push_back(func);
     }
 
     else if(type=='i')
     {
-        rs = binToInt(instruction.substr(6, 10));
+        rs = binToInt(instruction.substr(6, 5));
         fields.push_back(rs);
-        rt = binToInt(instruction.substr(11, 15));
+        rt = binToInt(instruction.substr(11, 5));
         fields.push_back(rt);
-        value = binToInt(instruction.substr(16, instruction.length()-1));
+        value = binToInt(instruction.substr(16,16));
         fields.push_back(value);
     }
 
     else if(type=='j')
     {
-        address = binToInt(instruction.substr(6, instruction.length()-1));
+        if(instruction.substr(6, 26)[0]=='0')
+            address = binToInt(instruction.substr(6, 26));
+        else
+            address = twosComplement(instruction.substr(6, 26));
+
         fields.push_back(address);
     }
 
 	return fields;
-}
-
+}   // working fine
+ 
 
 int main()
 {	
@@ -121,7 +155,7 @@ int main()
     vector<int> memory;                       // main memory
 
 
-	return 0;
+    return 0;
 }
 
 
@@ -129,6 +163,7 @@ int main()
 
     1) Write the code for factorial in mips.                    Done
     2) Write the instructions in instructions.txt               Done
+    3) Decode Instructions                                      Done
     3) Start interpreting                                       Pending
 
 
