@@ -5,14 +5,16 @@
 /*
     Factorial code:
     
-    li $s0 5 
-    li $s1 5  
-    
+    addi $s0 $zero 5    //  001000  10000   00000   0000000000000101    //  i type
+    addi $s1 $zero 5    //  001000  10001   00000   0000000000000101    //  i type
+    addi $t0 $zero 1    //  001000  01000   00000   0000000000000001    //  i type
+    addi $t1 $zero 1    //  001000  01001   00000   0000000000000001    //  i type
+
     loop:
-    beq $s1 $1 end 
-    subi $s1 $s1 1 
-    mul $s0 $s0 $s1 
-    j loop 
+    beq $s1 1 end       //  000100  10000   00001   0000000000000100    //  i type
+    sub $s1 $s1 $t0     //  000000  10001   10001   01000   00000   100010  // r type
+    mul $s0 $s0 $s1     //  000000  10000   10000   10001   00000   011000  // r type
+    j loop              //  000010  11111111111111111111111101          //  j type
 
     end:
 
@@ -21,13 +23,12 @@
 /*
     Instructions:
     
-    1) load immidiate
+    1) addi
     2) add
     3) subtract
     4) subtract immidiate
     5) mul
     6) jump
-
 */
 
 
