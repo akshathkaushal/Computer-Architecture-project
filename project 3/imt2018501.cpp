@@ -168,25 +168,28 @@ vector<int> decodeInstruct(string instruction)
 }   // working fine
  
 // interpreting instructions
-void addi(int rs, int rt, int val)
+void addi(int rt, int rs, int val)
 {
     registerFile[rt] = registerFile[rs]+val;
 }
 
-void sub(int rs, int rd, int rt)
+void sub(int rd, int rt, int rs)
 {
-    registerFile[rs] = registerFile[rd] - registerFile[rt];
+    registerFile[rd] = registerFile[rs] - registerFile[rt];
 }
 
-void mul(int rs, int rd, int rt)
+void mul(int rd, int rt, int rs)
 {
-    registerFile[rs] = registerFile[rt] * registerFile[rd];
+    registerFile[rd] = registerFile[rt] * registerFile[rs];
 }
 
-void beq(int rs, int rt, int offset)
+void beq(int rd, int rt, int offset)
 {
-    if(rs==rt) 
+    if(registerFile[rd]==rt) 
         pc+=offset;
+    else{
+        pc++;
+    }
 }
 
 void j(int offset)
@@ -209,11 +212,34 @@ int main()
     }
 
     int inst_count = instructions.size();
-    /*for(int i=0;i<instructions.size();i++)
+    //cout<<"$s0"<<" "<<"$s1"<<" "<<"$t0"<<" "<<"$t1"<<endl;
+    while(pc<inst_count)
+    //while(pc<)
     {
-        cout<<instructions[i]<<endl;
-    }*/
+        // call instructions here
+        vector<int> components = decodeInstruct(instructions[pc]);
+        if(components[0]==binToInt("001000")){
+            addi(components[1], components[2], components[3]);
+            pc++;
+        }
+        //cout<<registerFile[16]<<" "<<registerFile[17]<<" "<<registerFile[8]<<" "<<registerFile[9]<<endl;
+        
+        else if(components[0]==binToInt("000000"))
+        {
+            if(components[5]==binToInt("100010")){
+                sub(components[1], components[2], components[3]); 
+                pc++;
+            }
+            else if(components[5]==binToInt("011000")){
+                mul(components[1], components[2], components[3]);
+                pc++;
+            }
+        }
+        else if(components[0]==binToInt("000100")) beq(components[1], components[2], components[3]);
+        else if(components[0]==binToInt("000010")) j(components[1]);
+    }
 
+    //cout<<registerFile[16]<<endl;
 
     return 0;
 }
@@ -224,7 +250,8 @@ int main()
     1) Write the code for factorial in mips.                    Done
     2) Write the instructions in instructions.txt               Done
     3) Decode Instructions                                      Done
-    3) Start interpreting                                       Pending
+    4) Start interpreting                                       Done
+    5) Call the instructions in order of Factorial code         pending
 
 
 */
