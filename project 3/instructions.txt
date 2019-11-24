@@ -1,6 +1,0 @@
-addi
-add
-sub
-subi
-mul
-j 

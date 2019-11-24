@@ -27,6 +27,7 @@
     2) subtract
     3) mul
     4) jump
+    5) beq
 */
 
 
@@ -36,6 +37,25 @@
 using namespace std;
 
 int clock_cycles=0;
+
+vector<int> registerFile;      // register file
+vector<int> memory;            // main memory
+int pc=0;
+
+void initialize()
+{
+    // setting up register file
+    for(int i=0;i<32;i++)
+    {
+        registerFile.push_back(0);
+    }    
+
+    // initializing memory
+    for(int i=0;i<257;i++)
+    {
+        memory.push_back(0);
+    }
+}
 
 // Conversion from binary to integer
 int binToInt(string binary)
@@ -147,12 +167,52 @@ vector<int> decodeInstruct(string instruction)
 	return fields;
 }   // working fine
  
+// interpreting instructions
+void addi(int rs, int rt, int val)
+{
+    registerFile[rt] = registerFile[rs]+val;
+}
+
+void sub(int rs, int rd, int rt)
+{
+    registerFile[rs] = registerFile[rd] - registerFile[rt];
+}
+
+void mul(int rs, int rd, int rt)
+{
+    registerFile[rs] = registerFile[rt] * registerFile[rd];
+}
+
+void beq(int rs, int rt, int offset)
+{
+    if(rs==rt) 
+        pc+=offset;
+}
+
+void j(int offset)
+{
+    pc+=offset;
+}
 
 int main()
 {	
-	vector<string> instructions;	          // instruction set
-	vector<map<int, int>> registerFile;	      // register file
-    vector<int> memory;                       // main memory
+    // initializing memory and registers
+    initialize();
+    vector<string> instructions;   // instruction set
+
+    // reading from file
+    ifstream infile("instructions/factorial.txt");
+    string inst;
+    while(infile >> inst)
+    {
+        instructions.push_back(inst);
+    }
+
+    int inst_count = instructions.size();
+    /*for(int i=0;i<instructions.size();i++)
+    {
+        cout<<instructions[i]<<endl;
+    }*/
 
 
     return 0;
