@@ -5,22 +5,22 @@
 /*
     Factorial code:
     
-    addi $s0 $zero 5    //  001000  10000   00000   0000000000000101    //  i type
-    addi $s1 $zero 5    //  001000  10001   00000   0000000000000101    //  i type
-    addi $t0 $zero 1    //  001000  01000   00000   0000000000000001    //  i type
-    addi $t1 $zero 1    //  001000  01001   00000   0000000000000001    //  i type
+    addi $s0 $zero 5    //  001000  10000  00000  0000000000000101    //  i type
+    addi $s1 $zero 5    //  001000  10001  00000  0000000000000101    //  i type
+    addi $t0 $zero 1    //  001000  01000  00000  0000000000000001    //  i type
+    addi $t1 $zero 1    //  001000  01001  00000  0000000000000001    //  i type
 
     loop:
-    beq $s1 1 end       //  000100  10000   00001   0000000000000100    //  i type
-    sub $s1 $s1 $t0     //  000000  10001   10001   01000   00000   100010  // r type
-    mul $s0 $s0 $s1     //  000000  10000   10000   10001   00000   011000  // r type
+    beq $s1 1 end       //  000100  10000  00001  0000000000000100    //  i type
+    sub $s1 $s1 $t0     //  000000  10001  10001  01000  00000  100010  // r type
+    mul $s0 $s0 $s1     //  000000  10000  10000  10001  00000  011000  // r type
     j loop              //  000010  11111111111111111111111101          //  j type
 
     end:
 
 */
 
-/*
+/*000000
     Instructions:
     
     1) addi
@@ -63,14 +63,19 @@ char tellType(string instruction)
 {
 	char type;
 
+    if(instruction.substr(0,6)=="000000") type = 'r';
+    else if(instruction.substr(0,6)=="000010") type = 'j';
+    else type = 'i';
 	return type; // this will determine further action on the instruction
-}
+}   // working fine
 
 // Seperate different fields according to the type of instruction
 vector<int> decodeInstruct(string instruction, char type)
 {
-    // the course of this function will be determined by the return value of tellType
+    // the course of this function will be determined by the return value of tellType function
 	vector<int> fields;
+    
+    
     
 	return fields;
 }
@@ -82,6 +87,7 @@ int main()
 	vector<map<int, int>> registerFile;	      // register file
     vector<int> memory;                       // main memory
 
+
 	return 0;
 }
 
@@ -89,7 +95,7 @@ int main()
 /*  Hurdles:                                                    Status:
 
     1) Write the code for factorial in mips.                    Done
-    2) Write the instructions in instructions.txt               Pending
+    2) Write the instructions in instructions.txt               Done
     3) Start interpreting                                       Pending
 
 
