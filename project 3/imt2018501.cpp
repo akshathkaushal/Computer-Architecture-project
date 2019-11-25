@@ -11,7 +11,7 @@
     addi $t1 $zero 1    //  001000  01001  00000  0000000000000001    //  i type
 
     loop:
-    beq $s1 1 end       //  000100  10000  00001  0000000000000100    //  i type
+    beq $s1 1 end       //  000100  10001  00001  0000000000000101    //  i type
     sub $s1 $s1 $t0     //  000000  10001  10001  01000  00000  100010  // r type
     mul $s0 $s0 $s1     //  000000  10000  10000  10001  00000  011000  // r type
     j loop              //  000010  11111111111111111111111101          //  j type
@@ -175,7 +175,7 @@ void addi(int rt, int rs, int val)
 
 void sub(int rd, int rt, int rs)
 {
-    registerFile[rd] = registerFile[rs] - registerFile[rt];
+    registerFile[rd] = registerFile[rt] - registerFile[rs];
 }
 
 void mul(int rd, int rt, int rs)
@@ -185,8 +185,10 @@ void mul(int rd, int rt, int rs)
 
 void beq(int rd, int rt, int offset)
 {
-    if(registerFile[rd]==rt) 
+    if(registerFile[rd]==rt)
+    { 
         pc+=offset;
+    }
     else{
         pc++;
     }
@@ -199,6 +201,7 @@ void j(int offset)
 
 int main()
 {	
+    int check;
     // initializing memory and registers
     initialize();
     vector<string> instructions;   // instruction set
@@ -212,34 +215,49 @@ int main()
     }
 
     int inst_count = instructions.size();
-    //cout<<"$s0"<<" "<<"$s1"<<" "<<"$t0"<<" "<<"$t1"<<endl;
+    
+    cout<<"PC"<<"\t"<<"INST"<<"\t"<<"$s0"<<"\t"<<"$s1"<<"\t"<<"$t0"<<"\t"<<"$t1"<<endl<<endl;
+
     while(pc<inst_count)
-    //while(pc<)
     {
         // call instructions here
         vector<int> components = decodeInstruct(instructions[pc]);
         if(components[0]==binToInt("001000")){
+            cout<<"pc="<<pc<<"\taddi"<<"\t";
             addi(components[1], components[2], components[3]);
             pc++;
         }
-        //cout<<registerFile[16]<<" "<<registerFile[17]<<" "<<registerFile[8]<<" "<<registerFile[9]<<endl;
-        
+
+        else if(components[0]==binToInt("000100")){
+            cout<<"pc="<<pc<<"\tbeq"<<"\t";
+            beq(components[1], components[2], components[3]);
+            //cout<<"beq pc = "<<pc<<endl;
+        }
+
         else if(components[0]==binToInt("000000"))
         {
             if(components[5]==binToInt("100010")){
+                cout<<"pc="<<pc<<"\tsub"<<"\t";
                 sub(components[1], components[2], components[3]); 
                 pc++;
             }
             else if(components[5]==binToInt("011000")){
+                cout<<"pc="<<pc<<"\tmul"<<"\t";
                 mul(components[1], components[2], components[3]);
                 pc++;
             }
         }
-        else if(components[0]==binToInt("000100")) beq(components[1], components[2], components[3]);
-        else if(components[0]==binToInt("000010")) j(components[1]);
+
+        else if(components[0]==binToInt("000010")){
+            cout<<"pc="<<pc<<"\tj"<<"\t";
+            j(components[1]);    
+        }
+
+        cout<<registerFile[16]<<"\t"<<registerFile[17]<<"\t"<<registerFile[8]<<"\t"<<registerFile[9]<<endl;
+
     }
 
-    //cout<<registerFile[16]<<endl;
+    cout<<"\nAnswer = "<<registerFile[16]<<endl;
 
     return 0;
 }
