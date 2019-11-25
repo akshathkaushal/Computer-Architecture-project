@@ -5,17 +5,17 @@
 /*
     Factorial code:
 
-    lw   $s0 0($zero)   //  100011  10000  00000  0000000000000000    //  i type
-    lw   $s0 0($zero)   //  100011  10001  00000  0000000000000000    //  i type
-    addi $t0 $zero 1    //  001000  01000  00000  0000000000000001    //  i type
-    addi $t1 $zero 1    //  001000  01001  00000  0000000000000001    //  i type
+    lw   $s0 0($zero)   //  100011  10000  00000  0000000000000000          //  i type
+    lw   $s0 0($zero)   //  100011  10001  00000  0000000000000000          //  i type
+    addi $t0 $zero 1    //  001000  01000  00000  0000000000000001          //  i type
+    addi $t1 $zero 1    //  001000  01001  00000  0000000000000001          //  i type
 
     loop:
-    beq $s1 1 end       //  000100  10001  00001  0000000000000100    //  i type
-    sub $s1 $s1 $t0     //  000000  10001  10001  01000  00000  100010  // r type
-    mul $s0 $s0 $s1     //  000000  10000  10000  10001  00000  011000  // r type
-    j loop              //  000010  11111111111111111111111101          //  j type
-    sw  $s0 0($zero)   //  101011  10000  00000  0000000000000001    //  i type
+    beq $s1 1 end       //  000100  10001  00001  0000000000000100          //  i type
+    sub $s1 $s1 $t0     //  000000  10001  10001  01000  00000  100010      // r type
+    mul $s0 $s0 $s1     //  000000  10000  10000  10001  00000  011000      // r type
+    j loop              //  000010  11111111111111111111111101              //  j type
+    sw  $s0 0($zero)    //  101011  10000  00000  0000000000000001          //  i type
 
     end:
 
@@ -50,7 +50,7 @@ using namespace std;
     
 vector<int> registerFile;      // register file
 vector<int> memory;            // main memory
-int pc=0;
+int pc=0;                      // program counter
 
 void initialize()
 {
@@ -83,9 +83,10 @@ int binToInt(string binary)
         base = base * 2; 
     } 
   
-    return dec_value;   // working perfectly
+    return dec_value;   
 }	
 
+// get two's complement of a number
 int twosComplement(string address)
 {
     for(int i=0;i<address.length();i++)
@@ -131,7 +132,6 @@ vector<int> decodeInstruct(string instruction)
     // the course of this function will be determined by the return value of tellType function
 	vector<int> fields;
     int opcode, rs, rt, rd, shamt, func, value, address;
-    // value for addi, subi etc and address for jump
 
     char type = tellType(instruction);
 
@@ -256,6 +256,7 @@ int main()
             cout<<"pc="<<pc<<"\tsw"<<"\t";
             sw(components[1], components[2], components[3]);
             pc++;
+            clock_cycles+=4;
         }
 
         else if(components[0]==binToInt("100011"))
@@ -263,18 +264,20 @@ int main()
             cout<<"pc="<<pc<<"\tlw"<<"\t";
             lw(components[1], components[2], components[3]);
             pc++;
+            clock_cycles+=5;
         }
 
         else if(components[0]==binToInt("001000")){
             cout<<"pc="<<pc<<"\taddi"<<"\t";
             addi(components[1], components[2], components[3]);
             pc++;
+            clock_cycles+=4;
         }
 
         else if(components[0]==binToInt("000100")){
             cout<<"pc="<<pc<<"\tbeq"<<"\t";
             beq(components[1], components[2], components[3]);
-            //cout<<"beq pc = "<<pc<<endl;
+            clock_cycles+=3;
         }
 
         else if(components[0]==binToInt("000000"))
@@ -283,23 +286,27 @@ int main()
                 cout<<"pc="<<pc<<"\tsub"<<"\t";
                 sub(components[1], components[2], components[3]); 
                 pc++;
+                clock_cycles+=4;
             }
             else if(components[5]==binToInt("011000")){
                 cout<<"pc="<<pc<<"\tmul"<<"\t";
                 mul(components[1], components[2], components[3]);
                 pc++;
+                clock_cycles+=4;
             }
         }
 
         else if(components[0]==binToInt("000010")){
             cout<<"pc="<<pc<<"\tj"<<"\t";
             j(components[1]);    
+            clock_cycles+=3;
         }
 
         cout<<registerFile[16]<<"\t"<<registerFile[17]<<"\t"<<registerFile[8]<<"\t"<<registerFile[9]<<endl;
     }
 
     cout<<"\nAnswer = "<<memory[1]<<endl;
+    cout<<"Number of clock cycles taken = "<<clock_cycles<<endl;
     return 0;
 }
 
@@ -311,5 +318,5 @@ int main()
     3) Decode Instructions                                      Done
     4) Start interpreting                                       Done
     5) Call the instructions in order of Factorial code         Done
-    6) count the number of clock cycles                         pending
+    6) count the number of clock cycles                         Done
 */
