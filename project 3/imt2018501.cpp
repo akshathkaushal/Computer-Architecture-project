@@ -177,31 +177,38 @@ vector<int> decodeInstruct(string instruction)
 }   
  
 // interpreting instructions
+
+// store word in memory
 void sw(int rt, int rs, int offset)
 {
     memory[rs+offset] = registerFile[rt];
 }
 
+// load word from memory into register
 void lw(int rt, int rs, int offset)
 {
     registerFile[rt] = memory[rs+offset];
 }
 
+// add immidiate
 void addi(int rt, int rs, int val)
 {
     registerFile[rt] = registerFile[rs]+val;
 }
 
+// subtract
 void sub(int rd, int rt, int rs)
 {
     registerFile[rd] = registerFile[rt] - registerFile[rs];
 }
 
+// multiply
 void mul(int rd, int rt, int rs)
 {
     registerFile[rd] = registerFile[rt] * registerFile[rs];
 }
 
+// branch on equal
 void beq(int rd, int rt, int offset)
 {
     if(registerFile[rd]==rt)
@@ -213,10 +220,13 @@ void beq(int rd, int rt, int offset)
     }
 }
 
+// jump
 void j(int offset)
 {
     pc+=offset;
 }
+
+
 
 int main()
 {	
