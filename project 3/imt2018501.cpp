@@ -236,7 +236,7 @@ int main()
     // take input 
     int input;
     string swCode="";
-    cout<<"Enter a digit: ";
+    cout<<"\nEnter a digit: ";
     cin>>input;
     memory[0]=input;
 
@@ -328,5 +328,5 @@ int main()
     3) Decode Instructions                                      Done
     4) Start interpreting                                       Done
     5) Call the instructions in order of Factorial code         Done
-    6) count the number of clock cycles                         Done
+    6) Count the number of clock cycles                         Done
 */
