@@ -34,13 +34,13 @@
 */
 
 /*
-    Clocke cycles per instruction:
+    Clock cycles per instruction for pipelined MIPS:
 
     1) Load (5 cycles)
     2) Store (4 cycles)
     3) R-type (4 cycles)
     4) Branch (3 cycles)
-    5) Jump (3 cycles)
+    5) Jump (2 cycles)
 */
 
 
@@ -182,11 +182,11 @@ vector<int> decodeInstruct(string instruction)
 // store word in memory
 void sw(int rt, int rs, int offset)
 {
-    int r = registerFile[rt];   clock_cycles++;  // ID step
-    int loc = rs + offset;      clock_cycles++;  // EX step
+    int r = registerFile[rt];           clock_cycles++;  // ID step
+    int loc = rs + offset;              clock_cycles++;  // EX step
     int *p = &memory[loc];      
-    *p = r;                     clock_cycles++;  // MEM step
-
+    *p = r;                             clock_cycles++;  // MEM step
+                                        clock_cycles++;  // WB step
     //memory[rs+offset] = registerFile[rt];
 }
 
@@ -219,6 +219,7 @@ void sub(int rd, int rt, int rs)
     int *reg2Addr = &registerFile[rt];
     int *reg3Addr = &registerFile[rs];  clock_cycles++;    // ID step
     int sum = *reg2Addr - *reg3Addr;    clock_cycles++;    // EX step
+                                        clock_cycles++;    // MEM step
     *reg1Addr = sum;                    clock_cycles++;    // WB step
 
     //registerFile[rd] = registerFile[rt] - registerFile[rs];
@@ -231,6 +232,7 @@ void mul(int rd, int rt, int rs)
     int *reg2Addr = &registerFile[rt];
     int *reg3Addr = &registerFile[rs];  clock_cycles++;    // ID step
     int res = *reg2Addr * *reg3Addr;    clock_cycles++;    // EX step
+                                        clock_cycles++;    // MEM step
     *reg1Addr = res;                    clock_cycles++;    // WB step
     //registerFile[rd] = registerFile[rt] * registerFile[rs];
 }
@@ -239,7 +241,6 @@ void mul(int rd, int rt, int rs)
 void beq(int rd, int rt, int offset)
 {
     int *regAddr = &registerFile[rd];   clock_cycles++;    // ID step
-
     if(*regAddr==rt)            
     { 
         pc+=offset;
@@ -247,24 +248,30 @@ void beq(int rd, int rt, int offset)
     else{
         pc++;
     }                                   clock_cycles++;    // EX step
+                                        clock_cycles++;    // MEM step
+                                        clock_cycles++;    // WB step
 }
 
 // jump
 void j(int offset)
 {
-    pc+=offset;                         clock_cycles+=2;   // EX step                                                                                                                                                                                                                                                                                                                                                                                                                                              
+                                        clock_cycles++;    // ID step
+    pc+=offset;                         clock_cycles++;    // EX step
+                                        clock_cycles++;    // MEM step
+                                        clock_cycles++;    // WB step                                                                                                                                                                                                                                                                                                                                                                                                                                             
 }
 
 
 
 int main()
-{	
+{
+        cout<<"Factorial calculator by mimicking MIPS architecture:\n";	
     // initializing memory and registers
     initialize();
     
     int input;
     string swCode="";
-    cout<<"\nEnter a digit: ";
+    cout<<"Enter a digit: ";
     cin>>input;    
 
     memory[0]=input;
@@ -280,8 +287,8 @@ int main()
     }
 
     int inst_count = instructions.size();
-    
-    cout<<"PC"<<"\t"<<"INST"<<"\t"<<"$s0"<<"\t"<<"$s1"<<"\t"<<"$t0"<<"\t"<<"$t1"<<endl;
+
+    cout<<"\nPC"<<"\t"<<"INST"<<"\t"<<"$s0"<<"\t"<<"$s1"<<"\t"<<"$t0"<<"\t"<<"$t1"<<endl;
     cout<<"-------------------------------------------"<<endl;
 
     while(pc<inst_count)
