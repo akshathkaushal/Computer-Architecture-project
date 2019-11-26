@@ -187,6 +187,7 @@ void sw(int rt, int rs, int offset)
     int *p = &memory[loc];      
     *p = r;                             clock_cycles++;  // MEM step
                                         clock_cycles++;  // WB step
+    
     //memory[rs+offset] = registerFile[rt];
 }
 
@@ -234,6 +235,7 @@ void mul(int rd, int rt, int rs)
     int res = *reg2Addr * *reg3Addr;    clock_cycles++;    // EX step
                                         clock_cycles++;    // MEM step
     *reg1Addr = res;                    clock_cycles++;    // WB step
+    
     //registerFile[rd] = registerFile[rt] * registerFile[rs];
 }
 
