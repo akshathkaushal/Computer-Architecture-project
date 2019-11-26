@@ -51,6 +51,7 @@ using namespace std;
 vector<int> registerFile;      // register file
 vector<int> memory;            // main memory
 int pc=0;                      // program counter
+int clock_cycles=0;
 
 void initialize()
 {
@@ -181,49 +182,77 @@ vector<int> decodeInstruct(string instruction)
 // store word in memory
 void sw(int rt, int rs, int offset)
 {
-    memory[rs+offset] = registerFile[rt];
+    int r = registerFile[rt];   clock_cycles++;  // ID step
+    int loc = rs + offset;      clock_cycles++;  // EX step
+    int *p = &memory[loc];      
+    *p = r;                     clock_cycles++;  // MEM step
+
+    //memory[rs+offset] = registerFile[rt];
 }
 
 // load word from memory into register
 void lw(int rt, int rs, int offset)
 {
-    registerFile[rt] = memory[rs+offset];
+    int *regAddr = &registerFile[rt];   clock_cycles++;   // ID step
+    int loc = rs + offset;              clock_cycles++;   // EX step
+    int *p = &memory[loc];              clock_cycles++;   // MEM step    
+    *regAddr = *p;                      clock_cycles++;   // WB step
+
+    //registerFile[rt] = memory[rs+offset];
 }
 
 // add immidiate
 void addi(int rt, int rs, int val)
 {
-    registerFile[rt] = registerFile[rs]+val;
+    int *reg1Addr = &registerFile[rt];  
+    int *reg2Addr = &registerFile[rs];  clock_cycles++;    // ID step
+    int sum = *reg2Addr + val;          clock_cycles++;    // EX step
+    *reg1Addr = sum;                    clock_cycles++;    // WB step
+
+    //registerFile[rt] = registerFile[rs]+val;
 }
 
 // subtract
 void sub(int rd, int rt, int rs)
 {
-    registerFile[rd] = registerFile[rt] - registerFile[rs];
+    int *reg1Addr = &registerFile[rd];  
+    int *reg2Addr = &registerFile[rt];
+    int *reg3Addr = &registerFile[rs];  clock_cycles++;    // ID step
+    int sum = *reg2Addr - *reg3Addr;    clock_cycles++;    // EX step
+    *reg1Addr = sum;                    clock_cycles++;    // WB step
+
+    //registerFile[rd] = registerFile[rt] - registerFile[rs];
 }
 
 // multiply
 void mul(int rd, int rt, int rs)
 {
-    registerFile[rd] = registerFile[rt] * registerFile[rs];
+    int *reg1Addr = &registerFile[rd];  
+    int *reg2Addr = &registerFile[rt];
+    int *reg3Addr = &registerFile[rs];  clock_cycles++;    // ID step
+    int res = *reg2Addr * *reg3Addr;    clock_cycles++;    // EX step
+    *reg1Addr = res;                    clock_cycles++;    // WB step
+    //registerFile[rd] = registerFile[rt] * registerFile[rs];
 }
 
 // branch on equal
 void beq(int rd, int rt, int offset)
 {
-    if(registerFile[rd]==rt)
+    int *regAddr = &registerFile[rd];   clock_cycles++;    // ID step
+
+    if(*regAddr==rt)            
     { 
         pc+=offset;
     }
     else{
         pc++;
-    }
+    }                                   clock_cycles++;    // EX step
 }
 
 // jump
 void j(int offset)
 {
-    pc+=offset;
+    pc+=offset;                         clock_cycles+=2;   // EX step                                                                                                                                                                                                                                                                                                                                                                                                                                              
 }
 
 
@@ -232,15 +261,13 @@ int main()
 {	
     // initializing memory and registers
     initialize();
-
-    // take input 
+    
     int input;
     string swCode="";
     cout<<"\nEnter a digit: ";
-    cin>>input;
-    memory[0]=input;
+    cin>>input;    
 
-    int clock_cycles=0;
+    memory[0]=input;
 
     vector<string> instructions;   // instruction set
 
@@ -260,13 +287,12 @@ int main()
     while(pc<inst_count)
     {
         // call instructions here
-        vector<int> components = decodeInstruct(instructions[pc]);
+        vector<int> components = decodeInstruct(instructions[pc]);  clock_cycles++;  // instruction fetch and decode.
         if(components[0]==binToInt("101011"))
         {
             cout<<"pc="<<pc<<"\tsw"<<"\t";
             sw(components[1], components[2], components[3]);
             pc++;
-            clock_cycles+=4;
         }
 
         else if(components[0]==binToInt("100011"))
@@ -274,20 +300,17 @@ int main()
             cout<<"pc="<<pc<<"\tlw"<<"\t";
             lw(components[1], components[2], components[3]);
             pc++;
-            clock_cycles+=5;
         }
 
         else if(components[0]==binToInt("001000")){
             cout<<"pc="<<pc<<"\taddi"<<"\t";
             addi(components[1], components[2], components[3]);
             pc++;
-            clock_cycles+=4;
         }
 
         else if(components[0]==binToInt("000100")){
             cout<<"pc="<<pc<<"\tbeq"<<"\t";
             beq(components[1], components[2], components[3]);
-            clock_cycles+=3;
         }
 
         else if(components[0]==binToInt("000000"))
@@ -296,20 +319,17 @@ int main()
                 cout<<"pc="<<pc<<"\tsub"<<"\t";
                 sub(components[1], components[2], components[3]); 
                 pc++;
-                clock_cycles+=4;
             }
             else if(components[5]==binToInt("011000")){
                 cout<<"pc="<<pc<<"\tmul"<<"\t";
                 mul(components[1], components[2], components[3]);
                 pc++;
-                clock_cycles+=4;
             }
         }
 
         else if(components[0]==binToInt("000010")){
             cout<<"pc="<<pc<<"\tj"<<"\t";
-            j(components[1]);    
-            clock_cycles+=3;
+            j(components[1]); 
         }
 
         cout<<registerFile[16]<<"\t"<<registerFile[17]<<"\t"<<registerFile[8]<<"\t"<<registerFile[9]<<endl;
@@ -317,6 +337,7 @@ int main()
 
     cout<<"\nAnswer = "<<memory[1]<<endl;
     cout<<"Number of clock cycles taken = "<<clock_cycles<<endl;
+    
     return 0;
 }
 
