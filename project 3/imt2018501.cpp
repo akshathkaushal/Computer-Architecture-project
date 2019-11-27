@@ -18,7 +18,6 @@
     sw  $s0 0($zero)    //  101011  10000  00000  0000000000000001          //  i type
 
     end:
-
 */
 
 /*
@@ -34,7 +33,7 @@
 */
 
 /*
-    Clock cycles per instruction for pipelined MIPS:
+    Clock cycles per instruction:
 
     1) Load (5 cycles)
     2) Store (4 cycles)
@@ -186,7 +185,7 @@ void sw(int rt, int rs, int offset)
     int loc = rs + offset;              clock_cycles++;  // EX step
     int *p = &memory[loc];      
     *p = r;                             clock_cycles++;  // MEM step
-                                        clock_cycles++;  // WB step
+                                        //clock_cycles++;  // WB step
     
     //memory[rs+offset] = registerFile[rt];
 }
@@ -220,7 +219,7 @@ void sub(int rd, int rt, int rs)
     int *reg2Addr = &registerFile[rt];
     int *reg3Addr = &registerFile[rs];  clock_cycles++;    // ID step
     int sum = *reg2Addr - *reg3Addr;    clock_cycles++;    // EX step
-                                        clock_cycles++;    // MEM step
+                                        //clock_cycles++;    // MEM step
     *reg1Addr = sum;                    clock_cycles++;    // WB step
 
     //registerFile[rd] = registerFile[rt] - registerFile[rs];
@@ -233,7 +232,7 @@ void mul(int rd, int rt, int rs)
     int *reg2Addr = &registerFile[rt];
     int *reg3Addr = &registerFile[rs];  clock_cycles++;    // ID step
     int res = *reg2Addr * *reg3Addr;    clock_cycles++;    // EX step
-                                        clock_cycles++;    // MEM step
+                                        //clock_cycles++;    // MEM step
     *reg1Addr = res;                    clock_cycles++;    // WB step
     
     //registerFile[rd] = registerFile[rt] * registerFile[rs];
@@ -250,17 +249,17 @@ void beq(int rd, int rt, int offset)
     else{
         pc++;
     }                                   clock_cycles++;    // EX step
-                                        clock_cycles++;    // MEM step
-                                        clock_cycles++;    // WB step
+                                        //clock_cycles++;    // MEM step
+                                        //clock_cycles++;    // WB step
 }
 
 // jump
 void j(int offset)
 {
-                                        clock_cycles++;    // ID step
+                                        //clock_cycles++;    // ID step
     pc+=offset;                         clock_cycles++;    // EX step
-                                        clock_cycles++;    // MEM step
-                                        clock_cycles++;    // WB step                                                                                                                                                                                                                                                                                                                                                                                                                                             
+                                        //clock_cycles++;    // MEM step
+                                        //clock_cycles++;    // WB step                                                                                                                                                                                                                                                                                                                                                                                                                                             
 }
 
 
@@ -350,10 +349,9 @@ int main()
     return 0;
 }
 
-
 /*  Hurdles:                                                    Status:
 
-    1) Write the code for factorial in mips.                    Done
+    1) Write the code for factorial in MIPS                     Done
     2) Write the instructions in instructions.txt               Done
     3) Decode Instructions                                      Done
     4) Start interpreting                                       Done
