@@ -1,6 +1,6 @@
 # Simulation of non-pipelined MIPS processor for calculating factorial of a number #
 
-### Steps ###
+### Steps: ###
 
 ##### Clone the project #####
 ```
